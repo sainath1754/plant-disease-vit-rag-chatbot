@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+# ============================================================
+# knowledge_base/agronomic_knowledge.py
+# Generates the JSON knowledge documents used by the RAG module.
+#
+# Usage:
+#   python knowledge_base/agronomic_knowledge.py
+# ============================================================
+
+import os
+import json
+
+DOCS_DIR = os.path.join(os.path.dirname(__file__), "docs")
+
+
+KNOWLEDGE = [
+    # ── Tomato ────────────────────────────────────────────────
+    {
+        "title": "Tomato Early Blight — Alternaria solani",
+        "text" : (
+            "Causal organism: Alternaria solani (fungus). "
+            "Symptoms: Dark, concentric ring-like lesions ('bullseye') on lower, older leaves. "
+            "Yellow halo may surround spots. Stems and fruits also affected. "
+            "Favourable conditions: Warm (24–29°C), humid weather with wet foliage. "
+            "Chemical control: Chlorothalonil (Bravo) 2.5 g/L, Mancozeb 2.5 g/L, "
+            "Azoxystrobin (Amistar) 1 mL/L — spray every 7–10 days. "
+            "Biological control: Trichoderma viride soil application. "
+            "Cultural practices: Crop rotation (3 years), remove infected debris, "
+            "avoid overhead irrigation, stake plants for airflow, use resistant varieties."
+        )
+    },
+    {
+        "title": "Tomato Late Blight — Phytophthora infestans",
+        "text" : (
+            "Causal organism: Phytophthora infestans (oomycete). "
+            "Symptoms: Water-soaked, greyish-green lesions on leaves turning brown; "
+            "white cottony sporulation on underside; rapid vine collapse. "
+            "Favourable conditions: Cool (10–20°C), wet/foggy weather. "
+            "Chemical control: Metalaxyl + Mancozeb (Ridomil Gold), Cymoxanil 0.75 g/L, "
+            "Copper hydroxide 2.5 g/L — spray at first sign. "
+            "Cultural practices: Destroy infected plants immediately, plant certified seed, "
+            "avoid planting near potato fields, hilling reduces tuber infection."
+        )
+    },
+    {
+        "title": "Tomato Bacterial Spot — Xanthomonas vesicatoria",
+        "text" : (
+            "Causal organism: Xanthomonas vesicatoria (bacterium). "
+            "Symptoms: Small, water-soaked spots with yellow halos on leaves, stems, fruit. "
+            "Spots turn dark brown with irregular margins. "
+            "Favourable conditions: Warm (25–30°C), high humidity, rain splash. "
+            "Chemical control: Copper bactericide (copper hydroxide 2 g/L), "
+            "Streptomycin sulphate 0.5 g/L — spray every 7 days. "
+            "Cultural practices: Use disease-free transplants, avoid overhead watering, "
+            "do not work in wet crop, remove infected plants."
+        )
+    },
+    {
+        "title": "Tomato Septoria Leaf Spot — Septoria lycopersici",
+        "text" : (
+            "Causal organism: Septoria lycopersici (fungus). "
+            "Symptoms: Circular spots with dark borders and light grey centres, "
+            "with tiny black dots (pycnidia) visible at centre. Begins on lower leaves. "
+            "Chemical control: Chlorothalonil 2.5 g/L or Mancozeb 2.5 g/L, spray every 10 days. "
+            "Cultural practices: Mulch to prevent soil splash, rotate crops, stake plants."
+        )
+    },
+    # ── Potato ────────────────────────────────────────────────
+    {
+        "title": "Potato Early Blight — Alternaria solani",
+        "text" : (
+            "Symptoms: Angular dark brown spots with concentric rings on older leaves. "
+            "Defoliation reduces tuber yield. "
+            "Chemical control: Mancozeb 2.5 g/L, Chlorothalonil 2.5 g/L, "
+            "Azoxystrobin 1 mL/L — spray fortnightly. "
+            "Cultural practices: Certified seed, crop rotation, balanced fertilisation, "
+            "remove volunteer plants."
+        )
+    },
+    {
+        "title": "Potato Late Blight — Phytophthora infestans",
+        "text" : (
+            "Symptoms: Irregular water-soaked leaf lesions turning brown-black with pale border; "
+            "white sporulation on underside; infected tubers show brown rot. "
+            "Chemical control: Metalaxyl + Mancozeb (Ridomil), Dimethomorph 1 g/L — "
+            "preventive sprays before epidemic. "
+            "Cultural practices: Hilling, destroy culls, use resistant cultivars, "
+            "harvest early in epidemic years."
+        )
+    },
+    # ── Apple ─────────────────────────────────────────────────
+    {
+        "title": "Apple Scab — Venturia inaequalis",
+        "text" : (
+            "Symptoms: Olive-green to brown velvety spots on leaves and fruit; "
+            "infected fruit becomes scabby and cracked. "
+            "Chemical control: Captan 2.5 g/L, Myclobutanil 0.5 mL/L, "
+            "Lime sulfur (dormant) — apply pre-bloom through petal fall. "
+            "Cultural practices: Rake and destroy fallen leaves, prune for airflow, "
+            "plant resistant varieties (Gala, Fuji)."
+        )
+    },
+    {
+        "title": "Apple Black Rot — Botryosphaeria obtusa",
+        "text" : (
+            "Symptoms: Circular 'frog-eye' leaf spots; fruit rot starting at calyx end; "
+            "limb cankers with orange-red pycnidia. "
+            "Chemical control: Captan, Ziram, Thiophanate-methyl — "
+            "apply during infection periods. "
+            "Cultural practices: Prune out dead wood, mummified fruit removal, "
+            "avoid wounding bark."
+        )
+    },
+    # ── Corn ──────────────────────────────────────────────────
+    {
+        "title": "Corn Common Rust — Puccinia sorghi",
+        "text" : (
+            "Symptoms: Small, brick-red, oval pustules (uredia) on both leaf surfaces. "
+            "Severe infections cause yellowing and leaf death. "
+            "Chemical control: Propiconazole (Tilt) 0.5 mL/L or Azoxystrobin 1 mL/L — "
+            "apply at early rust detection. "
+            "Cultural practices: Plant resistant hybrids, early planting dates, "
+            "avoid excessive nitrogen."
+        )
+    },
+    {
+        "title": "Corn Gray Leaf Spot — Cercospora zeae-maydis",
+        "text" : (
+            "Symptoms: Rectangular tan/grey lesions between leaf veins. "
+            "Lesions coalesce, causing premature drying. "
+            "Chemical control: Trifloxystrobin + Propiconazole (Stratego), "
+            "Pyraclostrobin (Headline) — apply at VT/R1 stage. "
+            "Cultural practices: Crop rotation, tillage to bury residue, resistant hybrids."
+        )
+    },
+    # ── Grape ─────────────────────────────────────────────────
+    {
+        "title": "Grape Black Rot — Guignardia bidwellii",
+        "text" : (
+            "Symptoms: Circular tan spots with dark borders on leaves; "
+            "infected berries turn black and mummify. "
+            "Chemical control: Mancozeb, Myclobutanil (Rally), Captan — "
+            "apply from bud break through veraison. "
+            "Cultural practices: Remove mummified berries, prune for airflow, "
+            "weed-free rows to reduce humidity."
+        )
+    },
+    # ── Pepper ────────────────────────────────────────────────
+    {
+        "title": "Bell Pepper Bacterial Spot — Xanthomonas campestris",
+        "text" : (
+            "Symptoms: Water-soaked lesions on leaves, stems, fruit; "
+            "spots turn brown with yellow halo; "
+            "fruit spots are raised then sunken. "
+            "Chemical control: Copper hydroxide 2 g/L, Copper oxychloride — "
+            "apply preventively every 5–7 days. "
+            "Cultural practices: Disease-free transplants, crop rotation, "
+            "avoid overhead irrigation, surface disinfection of tools."
+        )
+    },
+    # ── Strawberry ────────────────────────────────────────────
+    {
+        "title": "Strawberry Leaf Scorch — Diplocarpon earlianum",
+        "text" : (
+            "Symptoms: Small irregular dark purple spots on leaves; "
+            "spots coalesce causing leaf scorch appearance; "
+            "severely affected leaves turn brown and die. "
+            "Chemical control: Captan, Myclobutanil, Azoxystrobin — spray monthly. "
+            "Cultural practices: Renovate beds after harvest, remove infected leaves, "
+            "use resistant varieties."
+        )
+    },
+    # ── General ───────────────────────────────────────────────
+    {
+        "title": "General Crop Protection & IPM Principles",
+        "text" : (
+            "Integrated Pest Management (IPM) for plant diseases: "
+            "1. Prevention: Use certified, disease-free seed; practice crop rotation (2–3 yr). "
+            "2. Cultural control: Proper plant spacing, optimum irrigation, balanced nutrition. "
+            "3. Biological control: Trichoderma, Bacillus subtilis as soil/foliar treatments. "
+            "4. Chemical control: Apply registered fungicide/bactericide only when threshold exceeded. "
+            "5. Monitoring: Scout fields weekly; record disease incidence. "
+            "6. Resistance management: Rotate fungicide modes of action (FRAC groups) "
+            "to delay resistance development."
+        )
+    },
+    {
+        "title": "Pesticide Safety & Application Guidelines",
+        "text" : (
+            "Safety: Wear PPE (gloves, goggles, respirator) during mixing/application. "
+            "Calibrate sprayer to deliver correct volume per hectare. "
+            "Pre-harvest interval (PHI): Follow label — typically 7–21 days for edible crops. "
+            "Disposal: Triple-rinse containers; dispose via approved scheme. "
+            "Environmental: Avoid spraying near water bodies or in high wind. "
+            "Resistance: Alternate between fungicide groups; do not use same FRAC code "
+            "more than 2 consecutive sprays."
+        )
+    },
+]
+
+
+def build_knowledge_base():
+    os.makedirs(DOCS_DIR, exist_ok=True)
+
+    # Split into chunks and save as JSON
+    output_path = os.path.join(DOCS_DIR, "agronomic_knowledge.json")
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(KNOWLEDGE, f, indent=2, ensure_ascii=False)
+
+    print(f"[Knowledge Base] Saved {len(KNOWLEDGE)} documents → {output_path}")
+
+
+if __name__ == "__main__":
+    build_knowledge_base()

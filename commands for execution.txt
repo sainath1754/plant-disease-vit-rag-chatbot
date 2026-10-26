@@ -1,0 +1,15 @@
+venv\Scripts\activate
+
+pip list
+
+python -c "import torch; print('GPU Available:', torch.cuda.is_available())"
+
+python -c "import os; print('Model found:', os.path.exists('checkpoints/best_model.pth'))"
+
+python -c "from models.vit_model import VisionTransformer; m = VisionTransformer(); print(sum(p.numel() for p in m.parameters()), 'total parameters')"
+
+python evaluate.py
+
+python inference.py --image D:\plant_disease_vit\TEST-IMAGES\potato_healthy.JPG
+
+python web/app.py

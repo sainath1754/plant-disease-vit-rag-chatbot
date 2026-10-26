@@ -1,0 +1,137 @@
+/* ============================================================
+   style.css — Plant Pathology Recognition Web UI
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green      : #2e7d32;
+  --green-light: #e8f5e9;
+  --green-mid  : #4caf50;
+  --red        : #c62828;
+  --blue       : #1565c0;
+  --grey       : #f4f6f8;
+  --border     : #dce1e7;
+  --text       : #1a1a2e;
+  --muted      : #607d8b;
+  --radius     : 12px;
+  --shadow     : 0 2px 16px rgba(0,0,0,.09);
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--grey);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header {
+  background: linear-gradient(135deg, #1b5e20, #2e7d32);
+  color: #fff;
+  padding: 18px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.header-inner { display: flex; align-items: center; gap: 16px; max-width: 900px; margin: 0 auto; }
+.logo   { font-size: 2.2rem; }
+h1      { font-size: 1.4rem; font-weight: 700; letter-spacing: .3px; }
+.subtitle { font-size: .85rem; opacity: .85; margin-top: 2px; }
+
+/* ── Main / Cards ────────────────────────────────────────── */
+main { max-width: 900px; margin: 28px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 24px; }
+
+.card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.card h2 { font-size: 1.15rem; margin-bottom: 8px; color: var(--green); }
+.card h3 { font-size: .98rem; margin: 18px 0 8px; color: var(--text); }
+.hint    { font-size: .88rem; color: var(--muted); margin-bottom: 18px; }
+
+/* ── Dropzone ────────────────────────────────────────────── */
+.dropzone {
+  border: 2px dashed var(--green-mid);
+  border-radius: var(--radius);
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s;
+  position: relative;
+  min-height: 160px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dropzone:hover, .dropzone.drag { background: var(--green-light); }
+.drop-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+.dropzone p { color: var(--muted); font-size: .9rem; }
+.small { font-size: .78rem !important; margin-top: 4px; }
+#preview { max-width: 100%; max-height: 280px; border-radius: 8px; object-fit: contain; }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  display: inline-block; padding: 10px 28px; border-radius: 8px;
+  font-size: .95rem; font-weight: 600; cursor: pointer; border: none;
+  transition: opacity .2s, transform .1s;
+}
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-primary   { background: var(--green); color: #fff; margin-top: 16px; }
+.btn-secondary { background: var(--blue);  color: #fff; }
+
+/* ── Result Header ───────────────────────────────────────── */
+.result-header { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.badge {
+  background: var(--green-light); color: var(--green);
+  padding: 4px 14px; border-radius: 20px; font-size: .9rem; font-weight: 600;
+  border: 1px solid var(--green-mid);
+}
+.badge-disease { background: #fce4ec; color: var(--red); border-color: #ef9a9a; }
+.confidence    { font-size: .9rem; color: var(--muted); margin-left: auto; }
+
+/* ── Prediction Bars ─────────────────────────────────────── */
+.pred-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pred-label  { width: 200px; font-size: .82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pred-bar-bg { flex: 1; background: #eceff1; border-radius: 4px; height: 12px; }
+.pred-bar    { height: 100%; border-radius: 4px; background: #90a4ae; transition: width .4s; }
+.pred-row.top .pred-bar { background: var(--green-mid); }
+.pred-pct    { width: 55px; font-size: .82rem; text-align: right; color: var(--muted); }
+
+/* ── Recommendation Box ──────────────────────────────────── */
+#recommendationBox {
+  background: #f9fbe7;
+  border-left: 4px solid var(--green-mid);
+  border-radius: 6px;
+  padding: 16px 18px;
+  font-size: .88rem;
+  white-space: pre-wrap;
+  line-height: 1.7;
+  color: #2e2e2e;
+}
+
+/* ── Chat ────────────────────────────────────────────────── */
+#chatMessages {
+  min-height: 80px; max-height: 300px; overflow-y: auto;
+  background: #fafafa; border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; margin-bottom: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.chat-msg {
+  padding: 8px 14px; border-radius: 16px; max-width: 80%; font-size: .9rem; line-height: 1.5;
+}
+.chat-msg.user { background: var(--green); color: #fff; align-self: flex-end; border-radius: 16px 16px 4px 16px; }
+.chat-msg.bot  { background: #e3f2fd; color: #0d47a1; align-self: flex-start; border-radius: 16px 16px 16px 4px; }
+
+.chat-input-row { display: flex; gap: 10px; }
+.chat-input-row input {
+  flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+  font-size: .92rem; outline: none;
+}
+.chat-input-row input:focus { border-color: var(--green-mid); }
+
+/* ── Footer ──────────────────────────────────────────────── */
+footer {
+  text-align: center; padding: 18px; font-size: .8rem;
+  color: var(--muted); border-top: 1px solid var(--border); margin-top: 16px;
+}

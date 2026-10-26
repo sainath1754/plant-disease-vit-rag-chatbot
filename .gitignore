@@ -1,0 +1,16 @@
+# Exclude data (your request)
+data/
+
+# Virtual environment (large, machine-specific)
+venv/
+
+# Model weights and outputs (too large for GitHub's 100 MB limit)
+checkpoints/
+outputs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# PyCharm settings
+.idea/

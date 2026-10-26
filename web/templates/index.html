@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plant Pathology Recognition — ViT + RAG</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <span class="logo">🌿</span>
+    <div>
+      <h1>Plant Pathology Recognition</h1>
+      <p class="subtitle">Vision Transformer + RAG Agronomic Advisory</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Upload Card ─────────────────────────────────── -->
+  <section class="card" id="upload-section">
+    <h2>🔍 Plant Disease Detection</h2>
+    <p class="hint">Upload a leaf image to detect disease and receive treatment advice.</p>
+
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="imageInput" accept="image/*" hidden />
+      <div id="dropzone-content">
+        <span class="drop-icon">📷</span>
+        <p>Click to upload or drag & drop a leaf image</p>
+        <p class="small">Supports JPG, PNG (max 10 MB)</p>
+      </div>
+      <img id="preview" src="" alt="Preview" hidden />
+    </div>
+
+    <button id="analyseBtn" class="btn btn-primary" disabled>
+      Analyse Leaf
+    </button>
+  </section>
+
+  <!-- ── Results Card ────────────────────────────────── -->
+  <section class="card" id="results-section" hidden>
+    <h2>📊 Detection Results</h2>
+
+    <div class="result-header">
+      <div class="badge" id="cropBadge"></div>
+      <div class="badge badge-disease" id="diseaseBadge"></div>
+      <div class="confidence" id="confidenceDisplay"></div>
+    </div>
+
+    <h3>Top Predictions</h3>
+    <div id="topPredictions"></div>
+
+    <h3>🌾 Treatment Recommendation</h3>
+    <pre id="recommendationBox"></pre>
+  </section>
+
+  <!-- ── Chat Advisory ───────────────────────────────── -->
+  <section class="card" id="chat-section">
+    <h2>💬 Agronomic Advisory Chat</h2>
+    <p class="hint">Ask follow-up questions about treatment, pesticides, or crop care.</p>
+
+    <div id="chatMessages"></div>
+
+    <div class="chat-input-row">
+      <input type="text" id="chatInput"
+             placeholder="e.g. What pesticide should I use?" />
+      <button id="chatSendBtn" class="btn btn-secondary">Send</button>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p>Plant Pathology Recognition · Vision Transformer (ViT-Base) · RAG Advisory
+     ·Trained On PlantVillage Dataset · </p>
+</footer>
+
+<script>
+  // ── State ─────────────────────────────────────────────────
+  let currentDisease = "";
+  let selectedFile   = null;
+
+  // ── Dropzone / Preview ────────────────────────────────────
+  const dropzone    = document.getElementById("dropzone");
+  const imageInput  = document.getElementById("imageInput");
+  const preview     = document.getElementById("preview");
+  const analyseBtn  = document.getElementById("analyseBtn");
+  const dzContent   = document.getElementById("dropzone-content");
+
+  dropzone.addEventListener("click", () => imageInput.click());
+  dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("drag"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("drag");
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+
+  imageInput.addEventListener("change", () => {
+    if (imageInput.files[0]) setFile(imageInput.files[0]);
+  });
+
+  function setFile(file) {
+    selectedFile = file;
+    const url    = URL.createObjectURL(file);
+    preview.src  = url;
+    preview.hidden = false;
+    dzContent.hidden = true;
+    analyseBtn.disabled = false;
+    document.getElementById("results-section").hidden = true;
+  }
+
+  // ── Analyse ───────────────────────────────────────────────
+  analyseBtn.addEventListener("click", async () => {
+    if (!selectedFile) return;
+
+    analyseBtn.textContent  = "Analysing…";
+    analyseBtn.disabled     = true;
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+
+    try {
+      const resp = await fetch("/predict", { method: "POST", body: formData });
+      const data = await resp.json();
+
+      if (!data.success) {
+        alert("Error: " + data.error);
+      } else {
+        showResults(data);
+        currentDisease = data.predicted_class;
+        addChatMessage("bot",
+          `I detected <strong>${data.disease}</strong> in your ${data.crop} plant `+
+          `with ${data.confidence}% confidence. Feel free to ask me anything about treatment!`);
+      }
+    } catch (err) {
+      alert("Request failed: " + err.message);
+    } finally {
+      analyseBtn.textContent = "Analyse Leaf";
+      analyseBtn.disabled    = false;
+    }
+  });
+
+  // ── Show Results ──────────────────────────────────────────
+  function showResults(data) {
+    const section = document.getElementById("results-section");
+    section.hidden = false;
+
+    document.getElementById("cropBadge").textContent     = "🌱 " + data.crop;
+    document.getElementById("diseaseBadge").textContent  = "🦠 " + data.disease;
+    document.getElementById("confidenceDisplay").textContent =
+      `Confidence: ${data.confidence}%`;
+
+    // Top predictions bar chart
+    const container = document.getElementById("topPredictions");
+    container.innerHTML = "";
+    const maxConf = data.top_predictions[0].confidence;
+
+    data.top_predictions.forEach((p, i) => {
+      const label    = p.class.split("___").pop().replace(/_/g, " ");
+      const pct      = ((p.confidence / maxConf) * 100).toFixed(1);
+      const isTop    = i === 0 ? "top" : "";
+      container.innerHTML += `
+        <div class="pred-row ${isTop}">
+          <span class="pred-label">${label}</span>
+          <div class="pred-bar-bg">
+            <div class="pred-bar" style="width:${pct}%"></div>
+          </div>
+          <span class="pred-pct">${p.confidence.toFixed(1)}%</span>
+        </div>`;
+    });
+
+    document.getElementById("recommendationBox").textContent = data.recommendation;
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+
+  // ── Chat ──────────────────────────────────────────────────
+  document.getElementById("chatSendBtn").addEventListener("click", sendChat);
+  document.getElementById("chatInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") sendChat();
+  });
+
+  async function sendChat() {
+    const input   = document.getElementById("chatInput");
+    const message = input.value.trim();
+    if (!message) return;
+
+    addChatMessage("user", message);
+    input.value = "";
+
+    try {
+      const resp = await fetch("/chat", {
+        method : "POST",
+        headers: { "Content-Type": "application/json" },
+        body   : JSON.stringify({ message, disease_context: currentDisease }),
+      });
+      const data = await resp.json();
+      addChatMessage("bot", data.reply);
+    } catch (err) {
+      addChatMessage("bot", "Sorry, I could not fetch a response. Please try again.");
+    }
+  }
+
+  function addChatMessage(role, text) {
+    const box = document.getElementById("chatMessages");
+    const div = document.createElement("div");
+    div.className = `chat-msg ${role}`;
+    div.innerHTML = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+</script>
+</body>
+</html>
